@@ -1,0 +1,230 @@
+{
+  "audit_status": "PASSED",
+  "recalculated_precision_at_k": {
+    "baseline": {
+      "P@10": 0.7,
+      "P@20": 0.65,
+      "P@50": 0.68,
+      "P@100": 0.59
+    },
+    "logistic_regression": {
+      "P@10": 1.0,
+      "P@20": 0.95,
+      "P@50": 0.98,
+      "P@100": 0.97
+    },
+    "random_forest": {
+      "P@10": 1.0,
+      "P@20": 0.95,
+      "P@50": 0.98,
+      "P@100": 0.97
+    },
+    "gradient_boosting": {
+      "P@10": 1.0,
+      "P@20": 0.95,
+      "P@50": 0.98,
+      "P@100": 0.96
+    }
+  },
+  "test_clients_distribution": [
+    {
+      "client_hash_id": "client_62f4a7e64f5e0096",
+      "pages": 17914,
+      "declining_pages": 11750,
+      "decline_rate": 0.6559115775371218,
+      "pct_of_test": 59.97,
+      "decline_rate_pct": 65.59
+    },
+    {
+      "client_hash_id": "client_e547b89c05043229",
+      "pages": 8742,
+      "declining_pages": 2565,
+      "decline_rate": 0.2934111187371311,
+      "pct_of_test": 29.26,
+      "decline_rate_pct": 29.34
+    },
+    {
+      "client_hash_id": "client_3f0ce4d44fe94f3d",
+      "pages": 2262,
+      "declining_pages": 372,
+      "decline_rate": 0.16445623342175067,
+      "pct_of_test": 7.57,
+      "decline_rate_pct": 16.45
+    },
+    {
+      "client_hash_id": "client_3197e6291363b4db",
+      "pages": 886,
+      "declining_pages": 691,
+      "decline_rate": 0.7799097065462754,
+      "pct_of_test": 2.97,
+      "decline_rate_pct": 77.99
+    },
+    {
+      "client_hash_id": "client_795153d5b7850ccf",
+      "pages": 48,
+      "declining_pages": 17,
+      "decline_rate": 0.3541666666666667,
+      "pct_of_test": 0.16,
+      "decline_rate_pct": 35.42
+    },
+    {
+      "client_hash_id": "client_08d2847f24cf89c1",
+      "pages": 17,
+      "declining_pages": 5,
+      "decline_rate": 0.29411764705882354,
+      "pct_of_test": 0.06,
+      "decline_rate_pct": 29.41
+    },
+    {
+      "client_hash_id": "client_8ae2bfb5aa1ffa1e",
+      "pages": 3,
+      "declining_pages": 0,
+      "decline_rate": 0.0,
+      "pct_of_test": 0.01,
+      "decline_rate_pct": 0.0
+    },
+    {
+      "client_hash_id": "client_9d54435aabd95a6c",
+      "pages": 1,
+      "declining_pages": 0,
+      "decline_rate": 0.0,
+      "pct_of_test": 0.0,
+      "decline_rate_pct": 0.0
+    }
+  ],
+  "train_clients_top10": [
+    {
+      "client_hash_id": "client_73cda7b4e4f265ea",
+      "pages": 22183,
+      "declining_pages": 8544,
+      "decline_rate": 0.38515980705945996,
+      "pct_of_train": 31.09,
+      "decline_rate_pct": 38.52
+    },
+    {
+      "client_hash_id": "client_23a62021009f63c4",
+      "pages": 12587,
+      "declining_pages": 4790,
+      "decline_rate": 0.3805513625168825,
+      "pct_of_train": 17.64,
+      "decline_rate_pct": 38.06
+    },
+    {
+      "client_hash_id": "client_08a6a72ff48e62c0",
+      "pages": 8286,
+      "declining_pages": 1632,
+      "decline_rate": 0.19695872556118754,
+      "pct_of_train": 11.61,
+      "decline_rate_pct": 19.7
+    },
+    {
+      "client_hash_id": "client_fef1a8f436438636",
+      "pages": 8203,
+      "declining_pages": 4535,
+      "decline_rate": 0.5528465195660124,
+      "pct_of_train": 11.5,
+      "decline_rate_pct": 55.28
+    },
+    {
+      "client_hash_id": "client_20259bd6705d81d4",
+      "pages": 3887,
+      "declining_pages": 621,
+      "decline_rate": 0.15976331360946747,
+      "pct_of_train": 5.45,
+      "decline_rate_pct": 15.98
+    },
+    {
+      "client_hash_id": "client_a80fca3f171ed1de",
+      "pages": 3036,
+      "declining_pages": 1051,
+      "decline_rate": 0.3461791831357049,
+      "pct_of_train": 4.25,
+      "decline_rate_pct": 34.62
+    },
+    {
+      "client_hash_id": "client_e5c2aa26a8598242",
+      "pages": 2610,
+      "declining_pages": 501,
+      "decline_rate": 0.19195402298850575,
+      "pct_of_train": 3.66,
+      "decline_rate_pct": 19.2
+    },
+    {
+      "client_hash_id": "client_9958f0a7ae1df715",
+      "pages": 1728,
+      "declining_pages": 1392,
+      "decline_rate": 0.8055555555555556,
+      "pct_of_train": 2.42,
+      "decline_rate_pct": 80.56
+    },
+    {
+      "client_hash_id": "client_2094c6eb080311d5",
+      "pages": 1699,
+      "declining_pages": 355,
+      "decline_rate": 0.20894643908181282,
+      "pct_of_train": 2.38,
+      "decline_rate_pct": 20.89
+    },
+    {
+      "client_hash_id": "client_157ffe4d4a595515",
+      "pages": 1225,
+      "declining_pages": 510,
+      "decline_rate": 0.4163265306122449,
+      "pct_of_train": 1.72,
+      "decline_rate_pct": 41.63
+    }
+  ],
+  "client_performance_breakdown": [
+    {
+      "client_hash_id": "client_62f4a7e64f5e0096",
+      "pages": 17914,
+      "base_rate_pct": 65.59,
+      "Baseline ROC": 0.5403,
+      "LR ROC": 0.745,
+      "RF ROC": 0.7551,
+      "GB ROC": 0.7551,
+      "Baseline PR-AUC": 0.6819,
+      "GB PR-AUC": 0.8371
+    },
+    {
+      "client_hash_id": "client_e547b89c05043229",
+      "pages": 8742,
+      "base_rate_pct": 29.34,
+      "Baseline ROC": 0.5063,
+      "LR ROC": 0.6795,
+      "RF ROC": 0.7159,
+      "GB ROC": 0.7287,
+      "Baseline PR-AUC": 0.2994,
+      "GB PR-AUC": 0.5597
+    },
+    {
+      "client_hash_id": "client_3f0ce4d44fe94f3d",
+      "pages": 2262,
+      "base_rate_pct": 16.45,
+      "Baseline ROC": 0.505,
+      "LR ROC": 0.7574,
+      "RF ROC": 0.7698,
+      "GB ROC": 0.7758,
+      "Baseline PR-AUC": 0.1683,
+      "GB PR-AUC": 0.4474
+    },
+    {
+      "client_hash_id": "client_3197e6291363b4db",
+      "pages": 886,
+      "base_rate_pct": 77.99,
+      "Baseline ROC": 0.626,
+      "LR ROC": 0.7865,
+      "RF ROC": 0.7802,
+      "GB ROC": 0.7653,
+      "Baseline PR-AUC": 0.8421,
+      "GB PR-AUC": 0.9123
+    }
+  ],
+  "top_100_model_overlap": {
+    "lr_rf": 45,
+    "rf_gb": 61,
+    "lr_gb": 57,
+    "all_three": 42,
+    "baseline_gb": 4
+  }
+}

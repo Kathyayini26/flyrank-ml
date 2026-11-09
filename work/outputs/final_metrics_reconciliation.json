@@ -1,0 +1,239 @@
+{
+  "audit_timestamp": "2026-11-09T20:28:00+05:30",
+  "evaluation_dataset_size": 29873,
+  "base_rate": 0.5155,
+  "authoritative_metrics": {
+    "Week 4 Baseline (Rule)": {
+      "ROC-AUC": 0.5066,
+      "PR-AUC": 0.5214,
+      "P@10": 0.7,
+      "P@20": 0.65,
+      "P@50": 0.68,
+      "P@100": 0.59,
+      "Brier_Score": "N/A"
+    },
+    "Logistic Regression": {
+      "ROC-AUC": 0.725,
+      "PR-AUC": 0.7245,
+      "P@10": 1.0,
+      "P@20": 0.95,
+      "P@50": 0.98,
+      "P@100": 0.97,
+      "Brier_Score": 0.216
+    },
+    "Random Forest (Canonical: 100 trees, d=10, leaf=25)": {
+      "ROC-AUC": 0.7353,
+      "PR-AUC": 0.7428,
+      "P@10": 1.0,
+      "P@20": 0.95,
+      "P@50": 0.98,
+      "P@100": 0.97,
+      "Brier_Score": 0.2129
+    },
+    "Random Forest (Notebook Variant: 150 trees, d=12, leaf=20)": {
+      "ROC-AUC": 0.7376,
+      "PR-AUC": 0.7457,
+      "P@10": 0.9,
+      "P@20": 0.95,
+      "P@50": 0.98,
+      "P@100": 0.98,
+      "Brier_Score": 0.2114
+    },
+    "HistGradientBoosting (Selected Model)": {
+      "ROC-AUC": 0.7441,
+      "PR-AUC": 0.7521,
+      "P@10": 1.0,
+      "P@20": 0.95,
+      "P@50": 0.98,
+      "P@100": 0.96,
+      "Brier_Score": 0.2085
+    }
+  },
+  "root_cause_analysis": {
+    "baseline_discrepancy": "In capstone.ipynb, the baseline formula was rewritten as `(mom_log_ratio <= -0.10) * (feat_position_volatility >= p75_vol) * feat_impressions`. The canonical Week 4 baseline (from w04_baseline_score.ipynb and 02_train_models.py) uses `(feat_impressions >= p75_imp) & (feat_ctr <= p25_ctr) & (feat_weighted_position <= 20.0)` with continuous tie-breaking. The canonical implementation yields ROC-AUC = 0.5066, P@10 = 0.70, P@50 = 0.68, P@100 = 0.59.",
+    "random_forest_discrepancy": "In capstone.ipynb, Random Forest was initialized with n_estimators=150, max_depth=12, min_samples_leaf=20 instead of the canonical n_estimators=100, max_depth=10, min_samples_leaf=25. The canonical hyperparameters yield ROC-AUC = 0.7353, PR-AUC = 0.7428, P@10 = 1.00, P@20 = 0.95, P@50 = 0.98, P@100 = 0.97.",
+    "gradient_boosting_status": "HistGradientBoosting is 100% identical and verified across all files: ROC-AUC = 0.7441, PR-AUC = 0.7521, P@10 = 1.00, P@20 = 0.95, P@50 = 0.98, P@100 = 0.96.",
+    "logistic_regression_status": "Logistic Regression is 100% identical and verified across all files: ROC-AUC = 0.7250, PR-AUC = 0.7245, P@10 = 1.00, P@20 = 0.95, P@50 = 0.98, P@100 = 0.97."
+  },
+  "calibration_audit": {
+    "HistGradientBoosting": {
+      "brier_score": 0.2085,
+      "bins_pred": [
+        0.0661,
+        0.1502,
+        0.2526,
+        0.3522,
+        0.4526,
+        0.5469,
+        0.6456,
+        0.7465,
+        0.8423,
+        0.9284
+      ],
+      "bins_true": [
+        0.0995,
+        0.2072,
+        0.3416,
+        0.3886,
+        0.4893,
+        0.6102,
+        0.7494,
+        0.8424,
+        0.8861,
+        0.9435
+      ]
+    },
+    "LogisticRegression": {
+      "brier_score": 0.216,
+      "bins_pred": [
+        0.0639,
+        0.1533,
+        0.256,
+        0.3555,
+        0.4514,
+        0.5477,
+        0.6425,
+        0.7371,
+        0.8368,
+        0.9338
+      ],
+      "bins_true": [
+        0.0761,
+        0.1834,
+        0.2575,
+        0.3905,
+        0.5184,
+        0.6329,
+        0.7506,
+        0.8545,
+        0.9458,
+        0.9615
+      ]
+    },
+    "RandomForest": {
+      "brier_score": 0.2129,
+      "bins_pred": [
+        0.0683,
+        0.1488,
+        0.2562,
+        0.3531,
+        0.4532,
+        0.5468,
+        0.6447,
+        0.7393,
+        0.8339,
+        0.915
+      ],
+      "bins_true": [
+        0.0567,
+        0.1639,
+        0.3111,
+        0.3974,
+        0.4949,
+        0.6277,
+        0.7735,
+        0.883,
+        0.9427,
+        1.0
+      ]
+    }
+  },
+  "client_subgroups": [
+    {
+      "client_hash_id": "client_08d2847f24cf89c1",
+      "pages": 17,
+      "declining_pages": 5,
+      "decline_rate": 0.2941,
+      "decline_rate_pct": "29.41%",
+      "has_sufficient_sample": false,
+      "sample_size_tier": "Insufficient (N < 50, Under-powered)",
+      "ROC-AUC": 0.75,
+      "PR-AUC": 0.6245,
+      "Precision@20": "N/A (< 20 pages)"
+    },
+    {
+      "client_hash_id": "client_3197e6291363b4db",
+      "pages": 886,
+      "declining_pages": 691,
+      "decline_rate": 0.7799,
+      "decline_rate_pct": "77.99%",
+      "has_sufficient_sample": true,
+      "sample_size_tier": "Sufficient (N >= 50)",
+      "ROC-AUC": 0.7653,
+      "PR-AUC": 0.9123,
+      "Precision@20": 1.0
+    },
+    {
+      "client_hash_id": "client_3f0ce4d44fe94f3d",
+      "pages": 2262,
+      "declining_pages": 372,
+      "decline_rate": 0.1645,
+      "decline_rate_pct": "16.45%",
+      "has_sufficient_sample": true,
+      "sample_size_tier": "Sufficient (N >= 50)",
+      "ROC-AUC": 0.7758,
+      "PR-AUC": 0.4474,
+      "Precision@20": 0.95
+    },
+    {
+      "client_hash_id": "client_62f4a7e64f5e0096",
+      "pages": 17914,
+      "declining_pages": 11750,
+      "decline_rate": 0.6559,
+      "decline_rate_pct": "65.59%",
+      "has_sufficient_sample": true,
+      "sample_size_tier": "Sufficient (N >= 50)",
+      "ROC-AUC": 0.7551,
+      "PR-AUC": 0.8371,
+      "Precision@20": 0.95
+    },
+    {
+      "client_hash_id": "client_795153d5b7850ccf",
+      "pages": 48,
+      "declining_pages": 17,
+      "decline_rate": 0.3542,
+      "decline_rate_pct": "35.42%",
+      "has_sufficient_sample": false,
+      "sample_size_tier": "Insufficient (N < 50, Under-powered)",
+      "ROC-AUC": 0.649,
+      "PR-AUC": 0.5975,
+      "Precision@20": 0.45
+    },
+    {
+      "client_hash_id": "client_8ae2bfb5aa1ffa1e",
+      "pages": 3,
+      "declining_pages": 0,
+      "decline_rate": 0.0,
+      "decline_rate_pct": "0.00%",
+      "has_sufficient_sample": false,
+      "sample_size_tier": "Insufficient (N < 50, Under-powered)",
+      "ROC-AUC": "Undefined (Single class)",
+      "PR-AUC": "Undefined (Single class)",
+      "Precision@20": "N/A (< 20 pages)"
+    },
+    {
+      "client_hash_id": "client_9d54435aabd95a6c",
+      "pages": 1,
+      "declining_pages": 0,
+      "decline_rate": 0.0,
+      "decline_rate_pct": "0.00%",
+      "has_sufficient_sample": false,
+      "sample_size_tier": "Insufficient (N < 50, Under-powered)",
+      "ROC-AUC": "Undefined (Single class)",
+      "PR-AUC": "Undefined (Single class)",
+      "Precision@20": "N/A (< 20 pages)"
+    },
+    {
+      "client_hash_id": "client_e547b89c05043229",
+      "pages": 8742,
+      "declining_pages": 2565,
+      "decline_rate": 0.2934,
+      "decline_rate_pct": "29.34%",
+      "has_sufficient_sample": true,
+      "sample_size_tier": "Sufficient (N >= 50)",
+      "ROC-AUC": 0.7287,
+      "PR-AUC": 0.5597,
+      "Precision@20": 0.95
+    }
+  ]
+}

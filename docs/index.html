@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Predicting Search Performance Decay — FlyRank AI/ML Research Paper</title>
+  <meta name="description" content="A Grouped Machine Learning Framework for Content Opportunity Prioritisation. FlyRank AI/ML Internship Capstone Paper." />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  
+  <!-- KaTeX for math typesetting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\[', right: '\\]', display: true},
+              {left: '\\(', right: '\\)', display: false}
+            ],
+            throwOnError: false
+          });"></script>
+
+  <style>
+    :root {
+      --bg: #fdfdfc;
+      --text: #1a1f2c;
+      --text-muted: #5a6474;
+      --primary: #0f2b5c;
+      --primary-light: #e8f0fe;
+      --accent: #0284c7;
+      --border: #e2e8f0;
+      --surface: #ffffff;
+      --code-bg: #f1f5f9;
+      --table-header: #0f2b5c;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Banner */
+    .top-banner {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 43, 92, 0.96);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+    }
+    .top-banner a {
+      color: #7dd3fc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .top-banner a:hover { color: #ffffff; text-decoration: underline; }
+    .banner-title { font-weight: 700; letter-spacing: 0.02em; }
+    .banner-links { display: flex; gap: 20px; align-items: center; }
+
+    /* Layout Container */
+    .paper-container {
+      max-width: 860px;
+      margin: 40px auto 100px;
+      padding: 0 24px;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      color: var(--primary);
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-top: 1.8em;
+      margin-bottom: 0.5em;
+    }
+    h1 {
+      font-size: 2.2rem;
+      line-height: 1.25;
+      color: #0b1e42;
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 16px;
+      margin-top: 0.5em;
+    }
+    h2 {
+      font-size: 1.45rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-top: 2.2em;
+    }
+    h3 { font-size: 1.18rem; color: #1e3a8a; }
+    h4 { font-size: 1.05rem; }
+
+    p {
+      margin: 0 0 1.25em;
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    /* Abstract Callout Box */
+    h2#2-abstract + p,
+    h2:nth-of-type(2) + p {
+      background: var(--primary-light);
+      border-left: 4px solid var(--primary);
+      padding: 20px 24px;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: 1.02rem;
+      line-height: 1.75;
+      font-style: italic;
+      color: #0c2340;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 28px 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 14.5px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    th {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #f8fafc; }
+    tr:hover td { background: #f1f5f9; }
+
+    /* Code Blocks */
+    code {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      background: var(--code-bg);
+      color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: 'Space Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin: 24px 0;
+    }
+    pre code { background: transparent; color: inherit; padding: 0; }
+
+    /* Figures */
+    .paper-figure {
+      margin: 36px 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .paper-figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+    figcaption {
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-muted);
+      margin-top: 14px;
+      padding: 0 4px;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin: 0 0 1.5em;
+      padding-left: 28px;
+    }
+    li { margin-bottom: 8px; }
+
+    /* Blockquotes */
+    blockquote {
+      margin: 24px 0;
+      padding: 16px 20px;
+      background: #f8fafc;
+      border-left: 4px solid var(--accent);
+      color: #334155;
+      font-style: italic;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+
+    /* Links */
+    a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    a:hover { color: var(--primary); }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+      padding-top: 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      body { font-size: 16px; }
+      h1 { font-size: 1.75rem; }
+      .top-banner { flex-direction: column; gap: 8px; align-items: flex-start; }
+      table { font-size: 13px; display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-banner">
+    <div class="banner-title">FlyRank AI/ML Research · Capstone Paper</div>
+    <div class="banner-links">
+      <a href="https://github.com/Kathyayini26/flyrank-ml" target="_blank" rel="noopener">GitHub Repository</a>
+      <a href="https://flyrank.ai" target="_blank" rel="noopener">FlyRank.ai</a>
+    </div>
+  </header>
+
+  <!-- Main Academic Paper Content -->
+  <main class="paper-container">
+    <h1>Predicting Search Performance Decay: A Grouped Machine Learning Framework for Content Opportunity Prioritisation</h1>
+<p><strong>Author:</strong> FlyRank AI/ML Research Intern<br />
+<strong>Affiliation:</strong> FlyRank ML Internship Program<br />
+<strong>Date:</strong> November 2026<br />
+<strong>Artifact Repository:</strong> <code>Kathyayini26/flyrank-ml</code><br />
+<strong>Dataset Reference:</strong> <code>hf://datasets/FlyRank/internship-warehouse</code> (Snapshot <code>v20260703</code>)</p>
+<hr />
+<h2>1. Title</h2>
+<p><strong>Predicting Search Performance Decay: A Grouped Machine Learning Framework for Content Opportunity Prioritisation</strong></p>
+<hr />
+<h2>2. Abstract</h2>
+<p>Enterprise search engine optimization (SEO) teams manage tens of thousands of published URLs, but constrained human editorial bandwidth makes comprehensive manual auditing impossible. To prevent organic traffic loss, teams require an automated, proactive decision-support system that flags established content URLs showing early signals of search performance decay before severe traffic collapse occurs. In this study, we utilize an enterprise warehouse release comprising 27.6 million daily performance records across 40 enterprise domains to model page-level search decay. We formalize search decay as a binary classification target: suffering an observed month-over-month decline of at least 20% in scale-normalized search impressions. Using a historical 59-day observation window (February–March 2026) and a 30-day forward outcome window (April 2026), we enforce a strict cohort contract ($\ge 100$ impressions, $\ge 15$ days historical tracking, and $\ge 15$ days forward observation coverage), isolating 101,226 eligible content pages with an empirical portfolio base rate of 41.69%. To address extreme month-over-month percentage swings caused by near-zero baselines, we engineer a 13-feature set with reduced redundancy centered on a symmetric log-ratio momentum feature. Models are evaluated strictly using an out-of-domain 80/20 client-grouped holdout split (32 training clients, 8 unseen test clients; 29,873 test pages) to prevent domain-level data leakage. Our selected tree ensemble, a Histogram-based Gradient Boosting Classifier, achieves a test ROC-AUC of 0.7441, a PR-AUC of 0.7521, and a Precision@100 of 0.9600, significantly outperforming an interpretable rule-based heuristic baseline (ROC-AUC 0.5066, Precision@100 0.5900). Subgroup evaluation across sufficiently powered client domains ($N \ge 50$, representing 99.77% of test data) demonstrates consistent discriminative stability (ROC-AUC 0.7287–0.7758; Precision@20 0.9500–1.0000). Finally, we operationalize model risk scores into an interpretable Content Opportunity Queue with rule-based diagnostic reason codes and non-causal editorial playbooks, directing editorial attention toward high-impact content maintenance.</p>
+<hr />
+<h2>3. Keywords</h2>
+<p>Search Engine Optimization, Content Decay, Machine Learning, Gradient Boosting, Out-of-Domain Validation, Grouped Holdout, Ranking Systems, Decision Support Systems, Information Retrieval.</p>
+<hr />
+<h2>4. Introduction</h2>
+<p>Organic search traffic constitutes a primary acquisition channel for digital enterprises. Maintaining organic traffic, however, requires ongoing editorial maintenance of published content. Content decay—the gradual or abrupt erosion of search visibility, ranking positions, and click-through rates across established pages—is an inevitable consequence of competitive publishing dynamics, algorithmic ranking updates, and evolving user search intent.</p>
+<p>When pages decay unnoticed, enterprises suffer compounding traffic losses that often require months of costly re-optimization to reverse. Conversely, timely editorial interventions—such as updating obsolete factual data, expanding comprehensive coverage of subtopics, improving search snippet alignment, or eliminating keyword cannibalization—can stabilize at-risk assets.</p>
+<p>Despite the clear necessity of content refreshes, human editorial resources are strictly finite. An enterprise editorial team managing a library of 10,000 to 50,000 pages can realistically audit and update only 50 to 200 pages during any given monthly publishing sprint. In current industry practice, prioritization is largely reactive or heuristic:</p>
+<ol>
+<li><strong>Catastrophic Reactivity:</strong> Content is audited only after executive leadership or clients observe a dramatic quarterly drop in conversions, forfeiting months of proactive recovery.</li>
+<li><strong>Naive Volume Sorting:</strong> Audits focus exclusively on top-trafficked URLs, ignoring whether their underlying rankings are perfectly stable while failing to detect decay in high-potential mid-tier assets.</li>
+<li><strong>Univariate Rule Thresholds:</strong> Arbitrary heuristics (e.g., flagging any page with an impression drop over 30 days) generate excessive false-positive rates due to natural weekly seasonality and multi-query volatility.</li>
+</ol>
+<p>Machine learning offers an objective, multivariate framework for prioritizing editorial bandwidth. By learning the subtle combinations of velocity, ranking volatility, click-through efficiency, and historical observation continuity that precede sustained traffic drops, predictive models can construct a ranked queue of content refresh candidates.</p>
+<p>Crucially, this operational challenge must be framed with methodological honesty: predicting which pages exhibit patterns resembling historical decay is an empirical ranking task. It provides prioritized decision support; it does not constitute a causal guarantee that updating a flagged page will mechanically restore lost impressions.</p>
+<hr />
+<h2>5. Research Problem and Objectives</h2>
+<h3>5.1 Primary Research Question</h3>
+<p>This research investigates the central question:
+$$\text{\textit{How can search performance signals be used to identify content opportunities and prioritise pages for improvement?}}$$</p>
+<h3>5.2 Core Investigation Objectives</h3>
+<p>To answer this question rigorously, this study establishes five core objectives:</p>
+<ol>
+<li><strong>Contract Formulation:</strong> Formulate a robust mathematical definition of search decay that normalizes for unequal monthly calendar lengths and enforces strict longitudinal observation criteria.</li>
+<li><strong>Leakage-Free Validation:</strong> Implement a client-grouped holdout experimental design that guarantees model evaluation occurs strictly on unseen enterprise domains, eliminating domain-level data leakage.</li>
+<li><strong>Feature Innovation:</strong> Engineer search performance features that capture momentum, ranking instability, and search intent efficiency while mathematically taming extreme outlier ratios.</li>
+<li><strong>Empirical Benchmarking:</strong> Train and rigorously compare linear and non-linear machine learning architectures against an interpretable rule-based heuristic baseline across discrimination (ROC-AUC), precision-recall trade-offs (PR-AUC), ranking precision (Precision@K), and probability calibration (Brier score).</li>
+<li><strong>Operationalization &amp; Playbooks:</strong> Translate raw model risk scores into an actionable, transparent Content Opportunity Queue augmented with human-interpretable reason codes and diagnostic editorial protocols.</li>
+</ol>
+<hr />
+<h2>6. Dataset Description and Data Contract</h2>
+<h3>6.1 Data Source and Granularity</h3>
+<p>The empirical foundation of this study is the enterprise warehouse snapshot <code>v20260703</code> hosted on Hugging Face (<code>hf://datasets/FlyRank/internship-warehouse</code>). The core reporting table utilized is <code>fact_content_daily_performance</code>, which records daily performance metrics aggregated from Google Search Console (GSC).</p>
+<p>The grain of the table is:
+$$\text{Granularity} = (\text{report_date}, \text{client_hash_id}, \text{content_hash_id})$$</p>
+<p>Every record represents the performance of an individual indexed URL belonging to an enterprise client on a specific calendar date.</p>
+<h3>6.2 Partition Audit and Temporal Windows</h3>
+<p>The dataset spans three consecutive monthly partitions:</p>
+<ul>
+<li><strong>Historical Feature Window ($T_{\text{feat}}$):</strong> February 1, 2026 through March 31, 2026 (59 calendar days: 28 days in February, 31 days in March).</li>
+<li><strong>Forward Outcome Window ($T_{\text{out}}$):</strong> April 1, 2026 through April 30, 2026 (30 calendar days).</li>
+</ul>
+<p>Table 1 summarizes the partition audit executed directly via SQL against the underlying Parquet warehouse.</p>
+<p><strong>Table 1: Warehouse Partition Audit Across Temporal Windows</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Month Partition</th>
+  <th>Calendar Days</th>
+  <th>Total Records</th>
+  <th>Distinct Clients</th>
+  <th>Distinct Content Items</th>
+  <th>Active GSC Availability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>February 2026</strong></td>
+  <td>28</td>
+  <td>9,845,120</td>
+  <td>40</td>
+  <td>178,214</td>
+  <td>100.0%</td>
+</tr>
+<tr>
+  <td><strong>March 2026</strong></td>
+  <td>31</td>
+  <td>10,212,410</td>
+  <td>40</td>
+  <td>185,422</td>
+  <td>100.0%</td>
+</tr>
+<tr>
+  <td><strong>April 2026</strong></td>
+  <td>30</td>
+  <td>7,556,445</td>
+  <td>40</td>
+  <td>194,760</td>
+  <td>100.0%</td>
+</tr>
+<tr>
+  <td><strong>Combined</strong></td>
+  <td>89</td>
+  <td><strong>27,613,975</strong></td>
+  <td>40</td>
+  <td>235,780</td>
+  <td>100.0%</td>
+</tr>
+</tbody>
+</table>
+<p>Across all three partitions, the tracking indicator <code>gsc_data_available</code> is uniformly true, confirming active data collection. Core performance fields (<code>gsc_impressions</code>, <code>gsc_clicks</code>, <code>gsc_avg_position</code>) contain zero null values across verified records.</p>
+<hr />
+<h2>7. Cohort Selection and Eligibility</h2>
+<h3>7.1 The Danger of Naive Cohort Filtering</h3>
+<p>In search performance modeling, naive filtering creates severe survivorship and observation artifacts. Specifically, newly published URLs in April skew performance comparisons, while pages with sparse tracking in April cannot be distinguished between genuine zero-impression drops and site tracking disruptions.</p>
+<h3>7.2 Formal Eligibility Contract</h3>
+<p>To ensure analytical integrity, we enforce four strict inclusion criteria:</p>
+<ol>
+<li><strong>Historical Scale Threshold:</strong> $\text{feat_impressions} \ge 100$. Long-tail pages with fewer than 100 impressions across 59 days represent extreme search noise, where stochastic fluctuations of 2 to 3 impressions create deceptive percentage swings.</li>
+<li><strong>Historical Persistence Threshold:</strong> $\text{feat_observed_days} \ge 15$. Ensures the content item possessed an established search footprint during the historical feature window.</li>
+<li><strong>Active Client Continuity:</strong> The parent enterprise client must be actively tracked during the forward April window.</li>
+<li><strong>Outcome Observation Coverage:</strong> $\text{apr_observed_days} \ge 15$. <strong>Critical safeguard:</strong> A content item must be observed for at least 15 days in April to confirm that zero or low recorded impressions reflect genuine search performance rather than tracking discontinuation, URL re-structuring, or tagging failure.</li>
+</ol>
+<p><strong>Table 2: Cohort Selection and Attrition Waterfall</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Filtering Stage</th>
+  <th>Qualifying Pages</th>
+  <th>Retention Rate</th>
+  <th>Excluded Pages</th>
+  <th>Methodological Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Raw February–March Population</strong></td>
+  <td>202,391</td>
+  <td>100.00%</td>
+  <td>0</td>
+  <td>All pages with at least 1 record in Feb–Mar.</td>
+</tr>
+<tr>
+  <td><strong>Historical Volume ($\ge 100$ imp)</strong></td>
+  <td>114,820</td>
+  <td>56.73%</td>
+  <td>87,571</td>
+  <td>Drops unindexed or zero-traffic long-tail noise.</td>
+</tr>
+<tr>
+  <td><strong>Historical Persistence ($\ge 15$ days)</strong></td>
+  <td>108,353</td>
+  <td>53.54%</td>
+  <td>6,467</td>
+  <td>Requires established longitudinal history.</td>
+</tr>
+<tr>
+  <td><strong>Active Client Continuity</strong></td>
+  <td>108,353</td>
+  <td>53.54%</td>
+  <td>0</td>
+  <td>All 40 clients remained tracked in April.</td>
+</tr>
+<tr>
+  <td><strong>April Coverage Safeguard ($\ge 15$ days)</strong></td>
+  <td><strong>101,226</strong></td>
+  <td><strong>50.01%</strong></td>
+  <td>7,127</td>
+  <td>Excludes pages with sparse or discontinued tracking.</td>
+</tr>
+</tbody>
+</table>
+<p>The final validated modeling cohort consists of <strong>101,226 content pages</strong> across 40 enterprise clients. Every key is unique ($(\text{client_hash_id}, \text{content_hash_id})$ uniqueness verified at 100%), with zero missing values.</p>
+<hr />
+<h2>8. Target Construction</h2>
+<h3>8.1 Calendar Length Normalization</h3>
+<p>The historical feature period comprises 59 calendar days, whereas April comprises 30 calendar days. Direct comparison of raw aggregated impressions would induce severe calendar length bias, falsely labeling over 80% of pages as declining.</p>
+<p>We establish the scale-normalized expected April impressions for each page as:
+$$\text{expected_apr_impressions} = \text{feat_impressions} \times \left(\frac{30.0}{59.0}\right)$$</p>
+<h3>8.2 Mathematical Target Definition</h3>
+<p>A page is classified as suffering a significant search performance decay ($Y = 1$) if its actual observed April impressions drop by at least 20% relative to its 30-day expectation:
+$$\text{target_declining_20pct} = \begin{cases} 1 &amp; \text{if } \text{apr_impressions} &lt; 0.80 \times \text{expected_apr_impressions} \ 0 &amp; \text{otherwise} \end{cases}$$</p>
+<p>This 20% threshold reflects standard industry consensus: a drop of 20% in scale-normalized search exposure over a 30-day period exceeds normal day-of-week seasonality, signaling a substantive loss of search engine visibility.</p>
+<h3>8.3 Class Balance and Empirical Base Rate</h3>
+<p>Across the 101,226 eligible pages:</p>
+<ul>
+<li><strong>Positive Class ($Y = 1$, Severe Decline):</strong> 42,204 pages</li>
+<li><strong>Negative Class ($Y = 0$, Stable or Growing):</strong> 59,022 pages</li>
+<li><strong>Portfolio Base Rate:</strong> <strong>41.69%</strong></li>
+</ul>
+<p>This demonstrates a healthy, balanced classification setting that avoids extreme class imbalance while reflecting real-world portfolio decay rates.</p>
+<hr />
+<h2>9. Feature Engineering and Outlier Treatment</h2>
+<h3>9.1 Candidate Feature Extraction</h3>
+<p>From the 59-day historical period ($T_{\text{feat}}$), we extracted 29 candidate features across four dimensions:</p>
+<ol>
+<li><strong>Scale and Volume:</strong> Total impressions, total clicks, daily average impressions, daily average clicks, log-transformed volume metrics.</li>
+<li><strong>Efficiency and Snippet Alignment:</strong> Aggregate Click-Through Rate (CTR), zero-click indicators, month-over-month CTR delta.</li>
+<li><strong>SERP Position Dynamics:</strong> Impression-weighted average position, daily position standard deviation (volatility), Page 1 indicator ($\text{position} \le 10.0$), Page 2 indicator ($\text{position} \le 20.0$), and month-over-month position shift.</li>
+<li><strong>Observation Persistence:</strong> Historical observed days, sub-window presence indicators (February history vs. March-only history).</li>
+</ol>
+<h3>9.2 Outlier Audit: The Denominator Problem</h3>
+<p>During exploratory feature auditing, the conventional percentage change feature:
+$$\text{mom_impression_change_pct} = \frac{\text{norm_mar_impressions} - \text{norm_feb_impressions}}{\text{norm_feb_impressions} + 1.0}$$
+exhibited an extreme maximum value of <strong>81,085.16%</strong>.</p>
+<p>Investigation revealed that this distortion was caused by 10,964 pages that were indexed late in February (or received 0 February impressions) and subsequently captured modest March traffic (e.g., 50 impressions). Dividing by a near-zero denominator produced enormous percentage swings that destabilize linear coefficients and distort tree split criteria.</p>
+<h3>9.3 Robust Symmetric Log-Ratio Momentum</h3>
+<p>Rather than truncating valid records or silently deleting legitimate data, we formulated a robust <strong>symmetric log-ratio momentum feature</strong>:
+$$\text{mom_log_ratio} = \log_{10}\left(\frac{\text{norm_mar_impressions} + 10.0}{\text{norm_feb_impressions} + 10.0}\right)$$</p>
+<p>Where:
+$$\text{norm_feb_impressions} = \text{feb_impressions} \times \left(\frac{30.0}{28.0}\right)$$
+$$\text{norm_mar_impressions} = \text{mar_impressions} \times \left(\frac{30.0}{31.0}\right)$$</p>
+<p>The pseudo-count (+10.0) stabilizes the ratio for low-volume baselines. As shown in Table 3, this transformation smoothly compresses extreme positive values while preserving monotonicity across decay trajectories.</p>
+<p><strong>Table 3: Outlier Treatment Comparison for Month-over-Month Momentum</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Distribution Statistic</th>
+  <th>Raw MoM Change Pct (<code>mom_impression_change_pct</code>)</th>
+  <th>Symmetric Log Ratio (<code>mom_log_ratio</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Minimum</strong></td>
+  <td>-100.00%</td>
+  <td>-2.7160</td>
+</tr>
+<tr>
+  <td><strong>25th Percentile ($Q_{25}$)</strong></td>
+  <td>-44.12%</td>
+  <td>-0.2145</td>
+</tr>
+<tr>
+  <td><strong>Median ($Q_{50}$)</strong></td>
+  <td>0.00%</td>
+  <td>0.0000</td>
+</tr>
+<tr>
+  <td><strong>75th Percentile ($Q_{75}$)</strong></td>
+  <td>+78.43%</td>
+  <td>+0.2218</td>
+</tr>
+<tr>
+  <td><strong>Maximum</strong></td>
+  <td><strong>+81,085.16%</strong></td>
+  <td><strong>+2.9812</strong></td>
+</tr>
+<tr>
+  <td><strong>Standard Deviation</strong></td>
+  <td>412.35%</td>
+  <td>0.4412</td>
+</tr>
+</tbody>
+</table>
+<h3>9.4 Final Feature Selection and Collinearity Filtering</h3>
+<p>To prevent multicollinearity and ensure zero data leakage, we conducted pairwise correlation analysis across all 29 candidates. Twenty-one feature pairs exhibited severe correlation ($r &gt; 0.85$, such as raw impressions vs. log impressions, and daily averages vs. totals). We retained a <strong>13-feature matrix with reduced redundancy</strong>, detailed in Table 4.</p>
+<p><strong>Table 4: Final 13-Feature Set with Reduced Redundancy</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Feature Name</th>
+  <th>Type</th>
+  <th>Mathematical Formulation / Source</th>
+  <th>Domain Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>log_feat_impressions</code></td>
+  <td>Continuous</td>
+  <td>$\log_{10}(\text{feat_impressions} + 1.0)$</td>
+  <td>Scale-invariant overall visibility.</td>
+</tr>
+<tr>
+  <td><code>log_feat_clicks</code></td>
+  <td>Continuous</td>
+  <td>$\log_{10}(\text{feat_clicks} + 1.0)$</td>
+  <td>Scale-invariant traffic capture.</td>
+</tr>
+<tr>
+  <td><code>feat_observed_days</code></td>
+  <td>Discrete</td>
+  <td>$\text{COUNT(DISTINCT report_date)}$</td>
+  <td>Tracking persistence (15 to 59 days).</td>
+</tr>
+<tr>
+  <td><code>feat_ctr</code></td>
+  <td>Continuous</td>
+  <td>$\text{feat_clicks} / \text{feat_impressions}$</td>
+  <td>Search snippet conversion efficiency.</td>
+</tr>
+<tr>
+  <td><code>is_zero_clicks</code></td>
+  <td>Binary</td>
+  <td>$\mathbb{I}(\text{feat_clicks} = 0)$</td>
+  <td>Complete lack of search click engagement.</td>
+</tr>
+<tr>
+  <td><code>feat_weighted_position</code></td>
+  <td>Continuous</td>
+  <td>$\sum(\text{pos} \times \text{imp}) / \sum(\text{imp})$</td>
+  <td>Average SERP placement across queries.</td>
+</tr>
+<tr>
+  <td><code>feat_position_volatility</code></td>
+  <td>Continuous</td>
+  <td>$\text{STDDEV}(\text{gsc_avg_position})$</td>
+  <td>Daily ranking turbulence / SERP instability.</td>
+</tr>
+<tr>
+  <td><code>is_top10_position</code></td>
+  <td>Binary</td>
+  <td>$\mathbb{I}(\text{feat_weighted_position} \le 10.0)$</td>
+  <td>Page 1 exposure context (high stakes).</td>
+</tr>
+<tr>
+  <td><code>is_top20_position</code></td>
+  <td>Binary</td>
+  <td>$\mathbb{I}(\text{feat_weighted_position} \le 20.0)$</td>
+  <td>Pages 1–2 placement context.</td>
+</tr>
+<tr>
+  <td><code>has_feb_history</code></td>
+  <td>Binary</td>
+  <td>$\mathbb{I}(\text{feb_observed_days} &gt; 0)$</td>
+  <td>Longitudinal presence across both months.</td>
+</tr>
+<tr>
+  <td><code>mom_log_ratio</code></td>
+  <td>Continuous</td>
+  <td>$\log_{10}((\text{mar_norm} + 10) / (\text{feb_norm} + 10))$</td>
+  <td>Velocity and momentum of search demand.</td>
+</tr>
+<tr>
+  <td><code>mom_ctr_change</code></td>
+  <td>Continuous</td>
+  <td>$\text{mar_ctr} - \text{feb_ctr}$</td>
+  <td>Change in snippet click efficiency.</td>
+</tr>
+<tr>
+  <td><code>mom_position_change</code></td>
+  <td>Continuous</td>
+  <td>$\text{mar_pos} - \text{feb_pos}$</td>
+  <td>Net SERP rank shift (positive = worsened).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>10. Experimental Design and Client-Grouped Validation</h2>
+<h3>10.1 The Grouped Leakage Hazard</h3>
+<p>In enterprise SEO analytics, hundreds or thousands of URLs belong to the same parent domain. Pages under a single client share global domain authority, shared backlink equity, unified technical CMS architectures, and global sitewide templates.</p>
+<p>If rows are partitioned randomly into train and test splits (a naive row-level split), pages from the same client appear in both sets. The machine learning model easily memorizes domain-level decay patterns, yielding inflated, non-generalizable evaluation metrics.</p>
+<h3>10.2 Client-Grouped Holdout Split Design</h3>
+<p>To establish true out-of-domain evaluation, we implement an <strong>80/20 client-grouped holdout split</strong>:</p>
+<ul>
+<li>All unique clients ($N = 40$) are randomly partitioned using a fixed random seed (<code>random_state=42</code>).</li>
+<li><strong>Training Set:</strong> 32 enterprise clients (<strong>71,353 pages</strong>, 70.49% of rows).</li>
+<li><strong>Held-Out Test Set:</strong> 8 unseen enterprise clients (<strong>29,873 pages</strong>, 29.51% of rows).</li>
+<li>Zero client overlap: $\text{Train Clients} \cap \text{Test Clients} = \emptyset$.</li>
+</ul>
+<p>All preprocessing scalers (StandardScaler) and heuristic quantile thresholds ($Q_{75}$ volatility, $Q_{25}$ CTR) are fitted strictly on the 32 training clients and applied downstream to the test clients without re-fitting.</p>
+<h3>10.3 Base Rate Divergence and Catalog Skew</h3>
+<p>A critical property of enterprise portfolios is catalog size disparity. In the training split, the empirical decline base rate is <strong>37.57%</strong>. In the held-out test split, the aggregate base rate is <strong>51.55%</strong>.</p>
+<p>This divergence is driven by a single large enterprise domain (<code>Domain A</code>), which contributes 17,914 pages (59.97% of the test cohort) and experienced an empirical decline rate of 65.59%.</p>
+<p>Crucially, when evaluating unweighted client base rates:</p>
+<ul>
+<li><strong>Training Portfolio Mean Client Base Rate:</strong> <strong>30.16%</strong></li>
+<li><strong>Test Portfolio Mean Client Base Rate:</strong> <strong>31.77%</strong></li>
+</ul>
+<p>The underlying distribution of client-level decline rates is highly consistent across both splits; the aggregate test percentage simply reflects natural enterprise catalog size weighting.</p>
+<hr />
+<h2>11. Baseline and Machine-Learning Models</h2>
+<p>We benchmark three machine learning architectures against an interpretable rule-based heuristic baseline.</p>
+<h3>11.1 Week 4 Baseline Rule</h3>
+<p>As established in preliminary project discovery, editorial teams often rely on rule-based heuristics that flag high-visibility pages exhibiting low click efficiency. Fitted strictly on training set quantiles:</p>
+<ul>
+<li>$Q_{75}$ Training Impressions = $788.0$</li>
+<li>$Q_{25}$ Training CTR = $0.0000$</li>
+</ul>
+<p>The rule assigns a tiered priority score:
+$$\text{baseline_score} = \begin{cases} 100.0 &amp; \text{if } \text{imp} \ge Q_{75} \land \text{ctr} \le Q_{25} \land \text{pos} \le 20.0 \ 50.0 &amp; \text{if } \text{imp} &lt; Q_{75} \ 0.0 &amp; \text{otherwise} \end{cases}$$</p>
+<p>To produce a continuous ranking for Precision@K evaluation, a deterministic tie-breaker is applied:
+$$\text{proxy_baseline} = \text{baseline_score} + \frac{\text{feat_impressions}}{\max(\text{feat_impressions}) + 1.0} - 0.01 \times \text{feat_ctr}$$</p>
+<h3>11.2 Logistic Regression</h3>
+<p>As a regularized linear baseline, we fit an L2-penalized Logistic Regression model ($C = 1.0$, <code>max_iter=1000</code>) on standardized features. Logistic regression provides a convex, linear benchmark that tests whether decay can be adequately predicted by additive feature combinations.</p>
+<h3>11.3 Random Forest Classifier</h3>
+<p>To capture non-linear relationships and feature interactions, we train an ensemble of 100 decision trees (<code>n_estimators=100</code>, <code>max_depth=10</code>, <code>min_samples_leaf=25</code>, <code>random_state=42</code>). Random Forest provides robust bagging variance reduction and provides Gini impurity feature importance scores.</p>
+<h3>11.4 Histogram-Based Gradient Boosting (HistGradientBoosting)</h3>
+<p>Our primary candidate architecture is a Histogram-based Gradient Boosting Classifier (<code>max_iter=100</code>, <code>max_depth=6</code>, <code>min_samples_leaf=30</code>, <code>learning_rate=0.08</code>, <code>random_state=42</code>). HistGradientBoosting bins continuous numeric features into 256 discrete integer bins, enabling efficient tree construction, robust handling of non-linear decision boundaries, and natural immunity to monotonic feature scale variations.</p>
+<hr />
+<h2>12. Results and Quantitative Comparison</h2>
+    <figure class="paper-figure">
+      <img src="img/capstone_evaluation_panel.png" alt="Figure 1: Comprehensive Model Evaluation Panel" loading="lazy" />
+      <figcaption><strong>Figure 1: Comprehensive Model Evaluation Panel.</strong> Multi-panel empirical evaluation across all benchmarked models on 29,873 held-out test pages. Top Left: ROC Curves showing HistGradientBoosting (AUC = 0.7441) vs. Week 4 Baseline (0.5066). Top Right: Precision-Recall Curves benchmarked against the 51.55% test base rate. Bottom Left: Precision@K across decision cutoffs K &in; {10, 20, 50, 100}. Bottom Right: Random Forest Gini Feature Importance.</figcaption>
+    </figure>
+    
+<h3>12.1 Evaluation Metrics</h3>
+    <figure class="paper-figure">
+      <img src="img/roc_curves_comparison.png" alt="Figure 2: Receiver Operating Characteristic (ROC) Curves" loading="lazy" />
+      <figcaption><strong>Figure 2: Receiver Operating Characteristic (ROC) Curves.</strong> True Positive Rate versus False Positive Rate across all decision thresholds for the Week 4 Rule Baseline (AUC = 0.5066), Logistic Regression (AUC = 0.7250), Random Forest (AUC = 0.7353), and HistGradientBoosting (AUC = 0.7441) evaluated on 29,873 held-out enterprise pages across 8 unseen clients.</figcaption>
+    </figure>
+    
+<p>Models are evaluated across four complementary evaluation dimensions:</p>
+<ol>
+<li><strong>Discrimination (ROC-AUC):</strong> Measures the ability of the model to rank a randomly chosen decaying page higher than a non-decaying page across all decision thresholds.</li>
+<li><strong>Precision-Recall Trade-off (PR-AUC / Average Precision):</strong> Evaluates positive class retrieval performance, critical under class imbalance and varying base rates.</li>
+<li><strong>Operational Top-K Precision (Precision@K):</strong> Evaluates the exact precision achieved within the top $K \in {10, 20, 50, 100}$ ranked pages. This directly simulates an editorial workflow where a team audits only the top $K$ flagged URLs.</li>
+<li><strong>Probability Calibration (Brier Score):</strong> Measures the mean squared error between predicted probabilities and actual binary outcomes ($Y \in {0, 1}$). Lower Brier scores indicate superior probabilistic accuracy.</li>
+</ol>
+<h3>12.2 Authoritative Reconciled Comparison</h3>
+    <figure class="paper-figure">
+      <img src="img/precision_at_k_comparison.png" alt="Figure 3: Operational Precision@K Across Decision Cutoffs" loading="lazy" />
+      <figcaption><strong>Figure 3: Operational Precision@K Across Decision Cutoffs.</strong> Precision achieved within the top K &in; {10, 20, 50, 100} ranked recommendations. All three machine learning models achieve &ge; 95% precision across top ranks, with HistGradientBoosting achieving 0.9600 Precision@100 versus 0.5900 for the rule baseline, compared against the held-out test cohort base rate of 51.55%.</figcaption>
+    </figure>
+    
+<p>Table 5 presents the authoritative performance metrics across all models evaluated on the identical 29,873 held-out test pages.</p>
+<p><strong>Table 5: Authoritative Model Comparison on Held-Out Test Cohort ($N = 29,873$, Base Rate = 51.55%)</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Model Architecture</th>
+  <th>Test ROC-AUC</th>
+  <th>Test PR-AUC</th>
+  <th>P@10</th>
+  <th>P@20</th>
+  <th>P@50</th>
+  <th>P@100</th>
+  <th>Brier Score</th>
+  <th>Decision Boundary F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Week 4 Baseline (Rule)</strong></td>
+  <td>0.5066</td>
+  <td>0.5214</td>
+  <td>0.7000</td>
+  <td>0.6500</td>
+  <td>0.6800</td>
+  <td>0.5900</td>
+  <td>N/A</td>
+  <td>0.6055</td>
+</tr>
+<tr>
+  <td><strong>Logistic Regression</strong></td>
+  <td>0.7250</td>
+  <td>0.7245</td>
+  <td><strong>1.0000</strong></td>
+  <td><strong>0.9500</strong></td>
+  <td><strong>0.9800</strong></td>
+  <td><strong>0.9700</strong></td>
+  <td>0.2160</td>
+  <td>0.6235</td>
+</tr>
+<tr>
+  <td><strong>Random Forest</strong></td>
+  <td>0.7353</td>
+  <td>0.7428</td>
+  <td><strong>1.0000</strong></td>
+  <td><strong>0.9500</strong></td>
+  <td><strong>0.9800</strong></td>
+  <td><strong>0.9700</strong></td>
+  <td>0.2129</td>
+  <td>0.6405</td>
+</tr>
+<tr>
+  <td><strong>HistGradientBoosting (Selected)</strong></td>
+  <td><strong>0.7441</strong></td>
+  <td><strong>0.7521</strong></td>
+  <td><strong>1.0000</strong></td>
+  <td><strong>0.9500</strong></td>
+  <td><strong>0.9800</strong></td>
+  <td>0.9600</td>
+  <td><strong>0.2085</strong></td>
+  <td><strong>0.6539</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: All ML models achieve near-perfect precision ($\ge 95%$) across top operational cutoffs ($K \le 50$), outperforming the rule baseline by up to 30 percentage points.</em></p>
+<h3>12.3 Model Selection Rationale</h3>
+<p>HistGradientBoosting is selected as the production architecture for three empirical reasons:</p>
+<ol>
+<li><strong>Superior Global Discrimination:</strong> Achieves the highest test ROC-AUC (<strong>0.7441</strong>) and PR-AUC (<strong>0.7521</strong>), representing a +0.2375 ROC-AUC lift over the rule baseline.</li>
+<li><strong>Superior Probabilistic Accuracy:</strong> Yields the lowest Brier score loss (<strong>0.2085</strong>), demonstrating tighter calibration across probability deciles.</li>
+<li><strong>Operational Ranking Excellence:</strong> Delivers 100% precision in the top 10 recommendations, 95% in the top 20, 98% in the top 50, and 96% in the top 100, providing an exceptionally clean signal for editorial sprint planning.</li>
+</ol>
+<hr />
+<h2>13. Client-Level Validation</h2>
+<h3>13.1 The Necessity of Subgroup Verification</h3>
+<p>Aggregate holdout performance can mask severe domain-level failure modes, particularly when one client represents 60% of test records. To establish whether HistGradientBoosting provides reliable decision support across independent websites, we perform a client-by-client audit.</p>
+<h3>13.2 Subgroup Performance Breakdown</h3>
+<p>To uphold statistical rigor, client cohorts are partitioned into <strong>Sufficiently Powered Subgroups ($N \ge 50$)</strong> and <strong>Under-powered Subgroups ($N &lt; 50$)</strong>. Table 6 details the empirical results.</p>
+<p><strong>Table 6: Client-Level Subgroup Performance Breakdown (HistGradientBoosting)</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Client Identifier</th>
+  <th>Pages ($N$)</th>
+  <th>Declining Pages</th>
+  <th>Domain Base Rate</th>
+  <th>Sample Size Status</th>
+  <th>ROC-AUC</th>
+  <th>PR-AUC</th>
+  <th>P@20</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Domain A (Primary Enterprise Client)</td>
+  <td>17,914</td>
+  <td>11,750</td>
+  <td>65.59%</td>
+  <td><strong>Sufficient ($N \ge 50$)</strong></td>
+  <td>0.7551</td>
+  <td>0.8371</td>
+  <td>0.9500</td>
+</tr>
+<tr>
+  <td>Domain B (Large Enterprise Portfolio)</td>
+  <td>8,742</td>
+  <td>2,565</td>
+  <td>29.34%</td>
+  <td><strong>Sufficient ($N \ge 50$)</strong></td>
+  <td>0.7287</td>
+  <td>0.5597</td>
+  <td>0.9500</td>
+</tr>
+<tr>
+  <td>Domain C (Mid-Tier Content Portal)</td>
+  <td>2,262</td>
+  <td>372</td>
+  <td>16.45%</td>
+  <td><strong>Sufficient ($N \ge 50$)</strong></td>
+  <td>0.7758</td>
+  <td>0.4474</td>
+  <td>0.9500</td>
+</tr>
+<tr>
+  <td>Domain D (Specialized Publishing Domain)</td>
+  <td>886</td>
+  <td>691</td>
+  <td>77.99%</td>
+  <td><strong>Sufficient ($N \ge 50$)</strong></td>
+  <td>0.7653</td>
+  <td>0.9123</td>
+  <td>1.0000</td>
+</tr>
+<tr>
+  <td>Domain E (Small Portfolio Cohort)</td>
+  <td>48</td>
+  <td>17</td>
+  <td>35.42%</td>
+  <td><strong>Insufficient ($N &lt; 50$)</strong></td>
+  <td>0.6490</td>
+  <td>0.5975</td>
+  <td>0.4500</td>
+</tr>
+<tr>
+  <td>Domain F (Micro Domain Cohort)</td>
+  <td>17</td>
+  <td>5</td>
+  <td>29.41%</td>
+  <td><strong>Insufficient ($N &lt; 50$)</strong></td>
+  <td>0.7500</td>
+  <td>0.6245</td>
+  <td>N/A ($N &lt; 20$)</td>
+</tr>
+<tr>
+  <td>Domain G (Emerging Site Cohort)</td>
+  <td>3</td>
+  <td>0</td>
+  <td>0.00%</td>
+  <td><strong>Insufficient ($N &lt; 50$)</strong></td>
+  <td><em>Undefined</em></td>
+  <td><em>Undefined</em></td>
+  <td>N/A ($N &lt; 20$)</td>
+</tr>
+<tr>
+  <td>Domain H (Single-Page Site Cohort)</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0.00%</td>
+  <td><strong>Insufficient ($N &lt; 50$)</strong></td>
+  <td><em>Undefined</em></td>
+  <td><em>Undefined</em></td>
+  <td>N/A ($N &lt; 20$)</td>
+</tr>
+</tbody>
+</table>
+<h3>13.3 Subgroup Claims and Boundaries</h3>
+<ol>
+<li><strong>Consistent Generalization Across Powered Portfolios:</strong> Among the 4 sufficiently powered client domains ($N \ge 50$), which encompass 29,804 pages (<strong>99.77%</strong> of the test cohort), the model demonstrates remarkable stability:<ul>
+<li>ROC-AUC remains stable between <strong>0.7287 and 0.7758</strong>.</li>
+<li>Precision@20 is uniformly <strong>0.9500 to 1.0000</strong>, succeeding equally on low-decline domains (16.45% base rate) and high-decline domains (77.99% base rate).</li>
+</ul>
+</li>
+<li><strong>Under-powered Cohort Disclaimer:</strong> The remaining 4 client domains contain between 1 and 48 pages (totaling 69 pages, <strong>0.23%</strong> of test records). With two domains possessing zero positive cases, metrics on these micro-cohorts are dominated by small-sample noise and cannot support scientific conclusions.</li>
+<li><strong>Universal Generalization Disclaimed:</strong> We do not claim universal generalization across arbitrary web architectures. The framework is empirically verified for established content portfolios possessing sufficient catalog depth.</li>
+</ol>
+<hr />
+<h2>14. Feature Importance and Interpretation</h2>
+<h3>14.1 Gini Impurity Feature Contributions</h3>
+    <figure class="paper-figure">
+      <img src="img/feature_importance_rf.png" alt="Figure 4: Random Forest Gini Feature Importance Distribution" loading="lazy" />
+      <figcaption><strong>Figure 4: Random Forest Gini Feature Importance Distribution.</strong> Relative predictive importance across the 13 engineered features. Month-over-month impression velocity (mom_log_ratio) represents the primary predictor at 38.28%, followed by longitudinal observation persistence (feat_observed_days, 15.12%) and snippet click-through efficiency (feat_ctr, 7.90%).</figcaption>
+    </figure>
+    
+<p>Feature importance was analyzed using the Gini impurity reduction from our 100-tree Random Forest ensemble. The relative importance distribution is displayed in Table 7.</p>
+<p><strong>Table 7: Random Forest Feature Importance Distribution</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Feature Name</th>
+  <th>Gini Importance</th>
+  <th>Cumulative Importance</th>
+  <th>Interpretive Domain Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>mom_log_ratio</code></td>
+  <td><strong>38.28%</strong></td>
+  <td>38.28%</td>
+  <td>Velocity and direction of month-over-month search exposure.</td>
+</tr>
+<tr>
+  <td><code>feat_observed_days</code></td>
+  <td><strong>15.12%</strong></td>
+  <td>53.40%</td>
+  <td>Longitudinal tracking persistence across historical window.</td>
+</tr>
+<tr>
+  <td><code>feat_ctr</code></td>
+  <td><strong>7.90%</strong></td>
+  <td>61.30%</td>
+  <td>Snippet click-through efficiency and user intent alignment.</td>
+</tr>
+<tr>
+  <td><code>feat_weighted_position</code></td>
+  <td><strong>7.03%</strong></td>
+  <td>68.33%</td>
+  <td>Impression-weighted average placement on SERP.</td>
+</tr>
+<tr>
+  <td><code>log_feat_clicks</code></td>
+  <td><strong>5.75%</strong></td>
+  <td>74.08%</td>
+  <td>Scale of historical organic engagement.</td>
+</tr>
+<tr>
+  <td><code>has_feb_history</code></td>
+  <td><strong>5.70%</strong></td>
+  <td>79.78%</td>
+  <td>Binary indicator of presence spanning both months.</td>
+</tr>
+<tr>
+  <td><code>feat_position_volatility</code></td>
+  <td><strong>5.56%</strong></td>
+  <td>85.34%</td>
+  <td>Instability of rankings across multi-query search results.</td>
+</tr>
+<tr>
+  <td><code>log_feat_impressions</code></td>
+  <td><strong>5.54%</strong></td>
+  <td>90.88%</td>
+  <td>Scale of historical search impression visibility.</td>
+</tr>
+<tr>
+  <td><code>mom_position_change</code></td>
+  <td><strong>4.39%</strong></td>
+  <td>95.27%</td>
+  <td>Net rank slippage month-over-month (positive = worsened).</td>
+</tr>
+<tr>
+  <td><code>mom_ctr_change</code></td>
+  <td><strong>2.33%</strong></td>
+  <td>97.60%</td>
+  <td>Month-over-month change in click capture rate.</td>
+</tr>
+<tr>
+  <td><code>is_top20_position</code></td>
+  <td><strong>0.98%</strong></td>
+  <td>98.58%</td>
+  <td>Placement context on Pages 1–2.</td>
+</tr>
+<tr>
+  <td><code>is_top10_position</code></td>
+  <td><strong>0.96%</strong></td>
+  <td>99.54%</td>
+  <td>Prime placement context on Page 1.</td>
+</tr>
+<tr>
+  <td><code>is_zero_clicks</code></td>
+  <td><strong>0.45%</strong></td>
+  <td>100.00%</td>
+  <td>Indicator for zero historical engagement.</td>
+</tr>
+</tbody>
+</table>
+<h3>14.2 Key Analytical Insights</h3>
+<ol>
+<li><strong>Momentum Dominance:</strong> The symmetric log-ratio momentum (<code>mom_log_ratio</code>) accounts for <strong>38.28%</strong> of total predictive importance. This confirms that early deceleration in impression velocity is the single strongest precursor of forward decay.</li>
+<li><strong>Observation Persistence:</strong> Historical tracking continuity (<code>feat_observed_days</code>, 15.12%) is the second most critical signal. Established pages with continuous daily observation exhibit distinct decay dynamics compared to intermittently indexed pages.</li>
+<li><strong>Position Dynamics vs. Static Placement:</strong> Ranking volatility (<code>feat_position_volatility</code>, 5.56%) and net rank slippage (<code>mom_position_change</code>, 4.39%) carry greater predictive weight than static Page 1/Page 2 binary indicators ($&lt; 1.0%$). How a page moves through search results is far more informative than where it currently sits.</li>
+</ol>
+<hr />
+<h2>15. Ranked Content Opportunity Framework</h2>
+<h3>15.1 Retrospective Evaluation vs. Future Operational Scoring</h3>
+<p>To ensure methodological clarity, we distinguish between two deployment contexts:</p>
+<ol>
+<li><strong>Retrospective Evaluation Queue (Current Study Deliverable):</strong> Built strictly on the <strong>29,873 held-out test pages</strong> across 8 unseen clients using the model trained on the 32 training clients. Ground-truth April labels are quarantined from features and retained in private artifacts solely to audit ranking precision.</li>
+<li><strong>Future Operational Scoring (Production Pipeline):</strong> When deploying to prioritize upcoming editorial sprints (e.g., scoring May 2026 using March–April historical features), the engineering pipeline fits HistGradientBoosting on 100% of available historical data across all active clients, scoring all active portfolio pages for editorial review.</li>
+</ol>
+<h3>15.2 Opportunity Tiering</h3>
+    <figure class="paper-figure">
+      <img src="img/risk_score_distribution.png" alt="Figure 5: Model Risk Score (Predicted Decline Probability) Distribution" loading="lazy" />
+      <figcaption><strong>Figure 5: Model Risk Score (Predicted Decline Probability) Distribution.</strong> Distribution of predicted decline probabilities across 29,873 held-out test pages, illustrating the separation between low-risk stable pages and high-priority decay candidates stratified across operational risk tiers.</figcaption>
+    </figure>
+    
+<p>Scored pages are stratified into operational risk tiers based on predicted decline probability:</p>
+<ul>
+<li><strong>Critical Priority ($\hat{p} \ge 0.85$):</strong> Severe, multi-signal decay trajectory requiring immediate sprint intervention.</li>
+<li><strong>High Opportunity ($0.65 \le \hat{p} &lt; 0.85$):</strong> Pronounced deceleration and ranking slippage; high-impact refresh candidate.</li>
+<li><strong>Moderate Opportunity ($0.40 \le \hat{p} &lt; 0.65$):</strong> Early warning signals; scheduled for secondary audit.</li>
+<li><strong>Low Risk / Monitor ($\hat{p} &lt; 0.40$):</strong> Stable or growing performance trajectory; maintain regular monitoring.</li>
+</ul>
+<h3>15.3 Public-Safe Top Recommendations Preview</h3>
+<p>Table 8 displays the top 10 ranked recommendations from the held-out evaluation queue. All client and content identifiers are replaced with synthetic opportunity IDs (<code>OPP_0001</code> through <code>OPP_0010</code>) to protect commercial privacy.</p>
+<p><strong>Table 8: Top 10 Ranked Content Opportunities (Public-Safe Sample)</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Rank</th>
+  <th>Opportunity ID</th>
+  <th>Predicted Decline Probability</th>
+  <th>Risk Tier</th>
+  <th>Historical Impressions</th>
+  <th>Weighted SERP Position</th>
+  <th>Dominant Reason Codes</th>
+  <th>Suggested Editorial Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>1</strong></td>
+  <td><code>OPP_0001</code></td>
+  <td>0.9903</td>
+  <td>Critical Priority</td>
+  <td>5,600</td>
+  <td>0.77</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>SERP_RANK_DETERIORATION</code> | <code>PAGE_ONE_HIGH_EXPOSURE</code></td>
+  <td><code>INVESTIGATE_SEARCH_DEMAND_DECLINE</code> | <code>REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS</code></td>
+</tr>
+<tr>
+  <td><strong>2</strong></td>
+  <td><code>OPP_0002</code></td>
+  <td>0.9879</td>
+  <td>Critical Priority</td>
+  <td>8,693</td>
+  <td>0.35</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>LOW_CTR_ON_PAGE_ONE</code> | <code>PAGE_ONE_HIGH_EXPOSURE</code></td>
+  <td><code>INVESTIGATE_SEARCH_DEMAND_DECLINE</code> | <code>OPTIMISE_TITLE_AND_SNIPPET_CTR</code></td>
+</tr>
+<tr>
+  <td><strong>3</strong></td>
+  <td><code>OPP_0003</code></td>
+  <td>0.9833</td>
+  <td>Critical Priority</td>
+  <td>4,401</td>
+  <td>0.70</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>LOW_CTR_ON_PAGE_ONE</code> | <code>HIGH_POSITION_VOLATILITY</code></td>
+  <td><code>INVESTIGATE_SEARCH_DEMAND_DECLINE</code> | <code>AUDIT_SERP_INSTABILITY</code></td>
+</tr>
+<tr>
+  <td><strong>4</strong></td>
+  <td><code>OPP_0004</code></td>
+  <td>0.9818</td>
+  <td>Critical Priority</td>
+  <td>3,927</td>
+  <td>3.05</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>SERP_RANK_DETERIORATION</code> | <code>PAGE_ONE_HIGH_EXPOSURE</code></td>
+  <td><code>REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS</code> | <code>ASSESS_EVERGREEN_CONTENT_FRESHNESS</code></td>
+</tr>
+<tr>
+  <td><strong>5</strong></td>
+  <td><code>OPP_0005</code></td>
+  <td>0.9800</td>
+  <td>Critical Priority</td>
+  <td>3,614</td>
+  <td>3.31</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>HIGH_POSITION_VOLATILITY</code> | <code>ESTABLISHED_ASSET_MONITORING</code></td>
+  <td><code>INVESTIGATE_SEARCH_DEMAND_DECLINE</code> | <code>AUDIT_SERP_INSTABILITY</code></td>
+</tr>
+<tr>
+  <td><strong>6</strong></td>
+  <td><code>OPP_0006</code></td>
+  <td>0.9800</td>
+  <td>Critical Priority</td>
+  <td>7,162</td>
+  <td>1.59</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>SERP_RANK_DETERIORATION</code> | <code>PAGE_ONE_HIGH_EXPOSURE</code></td>
+  <td><code>REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS</code> | <code>ASSESS_EVERGREEN_CONTENT_FRESHNESS</code></td>
+</tr>
+<tr>
+  <td><strong>7</strong></td>
+  <td><code>OPP_0007</code></td>
+  <td>0.9800</td>
+  <td>Critical Priority</td>
+  <td>5,568</td>
+  <td>1.33</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>HIGH_POSITION_VOLATILITY</code> | <code>PAGE_ONE_HIGH_EXPOSURE</code></td>
+  <td><code>INVESTIGATE_SEARCH_DEMAND_DECLINE</code> | <code>AUDIT_SERP_INSTABILITY</code></td>
+</tr>
+<tr>
+  <td><strong>8</strong></td>
+  <td><code>OPP_0008</code></td>
+  <td>0.9779</td>
+  <td>Critical Priority</td>
+  <td>4,918</td>
+  <td>1.51</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>SERP_RANK_DETERIORATION</code> | <code>PAGE_ONE_HIGH_EXPOSURE</code></td>
+  <td><code>REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS</code> | <code>ASSESS_EVERGREEN_CONTENT_FRESHNESS</code></td>
+</tr>
+<tr>
+  <td><strong>9</strong></td>
+  <td><code>OPP_0009</code></td>
+  <td>0.9774</td>
+  <td>Critical Priority</td>
+  <td>3,288</td>
+  <td>2.10</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>LOW_CTR_ON_PAGE_ONE</code> | <code>ESTABLISHED_ASSET_MONITORING</code></td>
+  <td><code>OPTIMISE_TITLE_AND_SNIPPET_CTR</code> | <code>ASSESS_EVERGREEN_CONTENT_FRESHNESS</code></td>
+</tr>
+<tr>
+  <td><strong>10</strong></td>
+  <td><code>OPP_0010</code></td>
+  <td>0.9756</td>
+  <td>Critical Priority</td>
+  <td>1,312</td>
+  <td>3.49</td>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code> | <code>SERP_RANK_DETERIORATION</code> | <code>LOW_CTR_ON_PAGE_ONE</code></td>
+  <td><code>REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS</code> | <code>OPTIMISE_TITLE_AND_SNIPPET_CTR</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>16. Reason Codes and Editorial Actions</h2>
+<h3>16.1 Theoretical Alignment and Descriptive Framing</h3>
+<p>Machine learning models often fail to achieve editorial adoption when delivered as opaque &quot;black boxes.&quot; To make recommendations trustworthy, every scored URL is annotated with deterministic, rule-based reason codes that describe observed historical conditions:</p>
+<ul>
+<li>Reason codes describe <strong>observed empirical patterns</strong>, not proven causes.</li>
+<li>Page placement attributes (e.g., Page 1 visibility) are explicitly treated as <strong>business impact / exposure context</strong>, not decline causes.</li>
+</ul>
+<h3>16.2 Verified Reason Code Dictionary</h3>
+<p>Table 9 defines the validated reason code rules, their statistical thresholds, and their operational meanings.</p>
+<p><strong>Table 9: Diagnostic Reason Code Dictionary</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Reason Code</th>
+  <th>Category</th>
+  <th>Quantitative Threshold Rule</th>
+  <th>Statistical &amp; Operational Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code></td>
+  <td>Decay Signal</td>
+  <td><code>mom_log_ratio &lt;= -0.15</code></td>
+  <td>Page suffered a $\ge 29.2%$ month-over-month drop in scale-normalized impressions, indicating steep traffic deceleration.</td>
+</tr>
+<tr>
+  <td><code>MILD_MOMENTUM_DECAY</code></td>
+  <td>Decay Signal</td>
+  <td><code>-0.15 &lt; mom_log_ratio &lt; 0.0</code></td>
+  <td>Observed negative momentum between $0%$ and $-29.2%$.</td>
+</tr>
+<tr>
+  <td><code>SERP_RANK_DETERIORATION</code></td>
+  <td>Decay Signal</td>
+  <td><code>mom_position_change &gt;= 2.0</code></td>
+  <td>Average SERP position increased numerically by $\ge 2.0$ ranks (e.g. slipped from position 4 to 6), indicating rank worsening.</td>
+</tr>
+<tr>
+  <td><code>HIGH_POSITION_VOLATILITY</code></td>
+  <td>Risk Signal</td>
+  <td><code>feat_position_volatility &gt;= 11.23</code></td>
+  <td>Ranking standard deviation exceeds training $Q_{75}$ (11.23), signaling severe multi-query turbulence or cannibalization.</td>
+</tr>
+<tr>
+  <td><code>PAGE_ONE_HIGH_EXPOSURE</code></td>
+  <td>Exposure Context</td>
+  <td><code>is_top10_position == 1</code> (<code>feat_weighted_position &lt;= 10.0</code>)</td>
+  <td><strong>Stakes Marker:</strong> Page occupies Page 1. Not a decline cause, but an indicator that rank loss carries severe business cost.</td>
+</tr>
+<tr>
+  <td><code>LOW_CTR_ON_PAGE_ONE</code></td>
+  <td>Efficiency Signal</td>
+  <td><code>is_top10_position == 1</code> $\land$ <code>feat_ctr &lt;= 0.0000</code></td>
+  <td>Bottom quartile CTR ($Q_{25} = 0.0000$) despite Page 1 visibility, indicating snippet mismatch or competitor dominance.</td>
+</tr>
+<tr>
+  <td><code>ESTABLISHED_ASSET_MONITORING</code></td>
+  <td>Asset Context</td>
+  <td><code>feat_observed_days &gt;= 50</code> $\land$ <code>has_feb_history == 1</code></td>
+  <td><strong>Longevity Marker:</strong> Tracked on $\ge 50$ of 59 days spanning both months. Confirms asset is established, evergreen content.</td>
+</tr>
+<tr>
+  <td><code>MULTIVARIATE_MODEL_SIGNAL</code></td>
+  <td>Model Signal</td>
+  <td>Fallback rule</td>
+  <td>High risk score driven by complex multi-feature interactions in gradient boosting not isolated by single rules.</td>
+</tr>
+</tbody>
+</table>
+<h3>16.3 Decision-Support Editorial Playbook</h3>
+<p>Each reason code maps directly to an investigative protocol within the editorial playbook (Table 10). Crucially, these protocols are framed as decision support: they provide prioritized investigative starting points rather than guaranteed traffic recoveries.</p>
+<p><strong>Table 10: Editorial Action Playbook Mapping</strong></p>
+<table>
+<thead>
+<tr>
+  <th>Triggered Reason Code</th>
+  <th>Recommended Editorial Task</th>
+  <th>Human Verification Protocol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>ACCELERATING_MOMENTUM_DROP</code></td>
+  <td><code>INVESTIGATE_SEARCH_DEMAND_DECLINE</code></td>
+  <td>Audit Google Trends and primary query intent to determine whether category-wide search volume dropped or if competitors captured share.</td>
+</tr>
+<tr>
+  <td><code>SERP_RANK_DETERIORATION</code></td>
+  <td><code>REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS</code></td>
+  <td>Audit top 3 competitor URLs on Google; identify missing subtopics, outdated statistics, or thinner coverage depth.</td>
+</tr>
+<tr>
+  <td><code>HIGH_POSITION_VOLATILITY</code></td>
+  <td><code>AUDIT_SERP_INSTABILITY</code></td>
+  <td>Audit site architecture for internal keyword cannibalization between multiple competing URLs; check for oscillating SERP features.</td>
+</tr>
+<tr>
+  <td><code>PAGE_ONE_HIGH_EXPOSURE</code></td>
+  <td><em>(Prioritization Modifier)</em></td>
+  <td>Elevates review priority in editorial backlog: audit high-exposure assets before addressing lower-traffic pages.</td>
+</tr>
+<tr>
+  <td><code>LOW_CTR_ON_PAGE_ONE</code></td>
+  <td><code>OPTIMISE_TITLE_AND_SNIPPET_CTR</code></td>
+  <td>Rewrite title tag and meta description to align with search intent, improve click appeal, and test structured schema markup.</td>
+</tr>
+<tr>
+  <td><code>ESTABLISHED_ASSET_MONITORING</code></td>
+  <td><code>ASSESS_EVERGREEN_CONTENT_FRESHNESS</code></td>
+  <td>Review core evergreen resource: update dated figures, refresh case studies, replace broken outbound links, and enhance visual media.</td>
+</tr>
+<tr>
+  <td><code>MULTIVARIATE_MODEL_SIGNAL</code></td>
+  <td><code>GENERAL_CONTENT_REVIEW</code></td>
+  <td>Conduct standard technical and content hygiene review: verify indexing status, mobile usability, and basic readability.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>17. Discussion and Practical Implications</h2>
+<h3>17.1 Bridging Data Science and Editorial Operations</h3>
+<p>The primary barrier to deploying machine learning in content operations is the disconnect between statistical risk probabilities and human editorial workflows. Editorial writers do not edit probabilities; they edit prose, titles, headers, and media.</p>
+<p>By translating model risk scores into an interpretable queue augmented with diagnostic reason codes, this framework bridges the operational gap. Editors receive a pre-filtered list where 96 out of 100 flagged URLs are genuinely decaying assets, accompanied by specific diagnostic instructions (e.g., &quot;Audit competitor relevance&quot; vs. &quot;Rewrite snippet&quot;).</p>
+<h3>17.2 The 3-Step Human Verification Workflow</h3>
+<p>To prevent premature or unhelpful content rewrites, editorial teams should execute a 3-step verification protocol before making changes:</p>
+<ol>
+<li><strong>Step 1: Check External Demand (Macro vs. Page Issue):</strong> Before editing a single word, verify whether category query demand declined seasonally across the industry. If industry demand dropped 40% in April, the page may be performing normally.</li>
+<li><strong>Step 2: Inspect Live Competitor SERPs:</strong> Search the primary target keyword in an incognito window. Determine whether competing publishers launched superior comprehensive guides, interactive tools, or video embeds.</li>
+<li><strong>Step 3: Handling False Positives and Intentional Changes:</strong> If an audit reveals that a flagged page was intentionally deprecated, consolidated into a canonical URL, or experienced a planned migration, editors tag the URL with feedback code <code>INTENTIONAL_CHANGE</code>. This operational feedback loop calibrates future training exclusion filters.</li>
+</ol>
+<hr />
+<h2>18. Limitations and Ethical Considerations</h2>
+<h3>18.1 Observational, Non-Causal Boundaries</h3>
+<p>This study models historical correlations between search performance signals and forward impression declines. The system <strong>does not prove causation</strong>. Specifically:</p>
+<ul>
+<li>A high predicted decline probability indicates that a page’s velocity and ranking dynamics match historical decay profiles.</li>
+<li>The model <strong>cannot guarantee</strong> that executing an editorial refresh will mechanically recover lost search impressions. True causal recovery requires randomized controlled A/B content refresh experiments.</li>
+</ul>
+<h3>18.2 Enterprise Portfolio Size Disparity</h3>
+<p>Our held-out test cohort reflects real-world enterprise distributions, where one enterprise client accounts for approximately 60% of test records (17,914 pages). While client-by-client subgroup analysis confirms that HistGradientBoosting maintains strong discrimination across all sufficiently powered domains (ROC-AUC 0.7287–0.7758), aggregate precision metrics reflect this portfolio weighting.</p>
+<h3>18.3 Established Page Cohort Boundary</h3>
+<p>The model is strictly calibrated for established content ($\ge 100$ impressions, $\ge 15$ days historical tracking). It <strong>cannot be applied</strong> to newly published URLs, ephemeral news posts, or ultra-long-tail pages with single-digit impression volumes. Cold-start content requires separate indexing heuristics.</p>
+<h3>18.4 Unobserved Macro Confounders</h3>
+<p>Search visibility is subject to major external confounders, including unannounced Google core algorithm updates, seasonal holiday shifts, and search engine layout redesigns (e.g., expansion of AI Overviews displacing organic blue links). Without external category benchmark feeds, page-level decay models cannot disentangle macro algorithmic shocks from organic content fatigue.</p>
+<hr />
+<h2>19. Reproducibility</h2>
+<h3>19.1 Code and Artifact Repositories</h3>
+<p>To ensure complete scientific reproducibility, all code, SQL pipelines, and validation receipts are preserved in the open repository:</p>
+<ul>
+<li><strong>Repository:</strong> <code>https://github.com/Kathyayini26/flyrank-ml</code></li>
+<li><strong>Primary Walkthrough Notebook:</strong> <code>work/notebooks/capstone.ipynb</code> (mirrored to root <code>capstone.ipynb</code>).</li>
+<li><strong>Feature Pipeline Script:</strong> <code>work/scripts/01_engineer_features.py</code></li>
+<li><strong>Training Pipeline Script:</strong> <code>work/scripts/02_train_models.py</code></li>
+<li><strong>Validation Audit Script:</strong> <code>work/scripts/03_validation_audit.py</code></li>
+<li><strong>Queue Generation Script:</strong> <code>work/scripts/04_build_opportunity_queue.py</code></li>
+</ul>
+<h3>19.2 Execution Environment and Seeds</h3>
+<ul>
+<li><strong>Python Version:</strong> Python 3.13</li>
+<li><strong>Primary Libraries:</strong> DuckDB 1.1+, Pandas 2.2+, Scikit-Learn 1.6+, Matplotlib 3.10+</li>
+<li><strong>Deterministic Random Seed:</strong> <code>random_state = 42</code> (applied uniformly across client hashing, client-grouped splitting, and tree ensembles).</li>
+<li><strong>Execution Runtime:</strong> Full top-to-bottom execution of <code>capstone.ipynb</code> runs in under 30 seconds on standard commodity hardware.</li>
+</ul>
+<hr />
+<h2>20. Conclusion and Future Work</h2>
+<h3>20.1 Conclusion</h3>
+<p>This research demonstrates that search performance signals—specifically symmetric month-over-month impression velocity, observation persistence, ranking volatility, and snippet efficiency—can be harnessed via machine learning to proactively detect content decay. Evaluated on a strictly isolated, out-of-domain holdout cohort of 29,873 enterprise pages, our Histogram-based Gradient Boosting model achieves a test ROC-AUC of <strong>0.7441</strong>, a PR-AUC of <strong>0.7521</strong>, and lifts Precision@100 from <strong>0.5900</strong> (rule baseline) to <strong>0.9600</strong>. Subgroup evaluation confirms stable discriminative power across all powered enterprise domains ($N \ge 50$). By translating model predictions into an interpretable Content Opportunity Queue with diagnostic reason codes, this framework provides enterprise editorial teams with an actionable, highly efficient decision-support system.</p>
+<h3>20.2 Future Work</h3>
+<p>Future research directions include:</p>
+<ol>
+<li><strong>Natural Language Content Features:</strong> Integrating semantic text features (e.g., content readability scores, word count, entity density, and embedding distance from top-ranking competitor text) directly into the feature matrix.</li>
+<li><strong>Causal Refresh Experiments:</strong> Conducting randomized prospective experiments where flagged pages are split into refreshed vs. unrefreshed cohorts to formally estimate the causal treatment effect of content updates.</li>
+<li><strong>Macro Demand De-Trending:</strong> Incorporating Google Trends or category-level search volume indices to normalize page performance against macro industry search demand shifts.</li>
+</ol>
+<hr />
+<h2>21. Acknowledgements and Dataset Credit</h2>
+<p>Built on the FlyRank ML Internship dataset (<a href="https://flyrank.ai">https://flyrank.ai</a>). The author expresses sincere appreciation to the FlyRank AI/ML Internship mentors, evaluators, and engineering team for curating the enterprise warehouse dataset, designing the weekly research curriculum, and providing the pedagogical framework that guided this capstone investigation.</p>
+
+  </main>
+
+  <footer>
+    <p>Built on the FlyRank ML Internship dataset &middot; <a href="https://flyrank.ai" target="_blank" rel="noopener">https://flyrank.ai</a> &middot; November 2026</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "top_10": {
+    "n_recommendations": 10,
+    "mean_predicted_probability": 0.9814,
+    "actual_decline_rate_retrospective": 1.0,
+    "mean_impressions_at_risk": 4848.3,
+    "mean_weighted_position": 1.82,
+    "top_reason_codes": {
+      "ACCELERATING_MOMENTUM_DROP": 10,
+      "SERP_RANK_DETERIORATION": 10,
+      "PAGE_ONE_HIGH_EXPOSURE": 10
+    },
+    "top_actions": {
+      "INVESTIGATE_SEARCH_DEMAND_DECLINE": 10,
+      "REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS": 10,
+      "ASSESS_EVERGREEN_CONTENT_FRESHNESS": 9
+    }
+  },
+  "top_20": {
+    "n_recommendations": 20,
+    "mean_predicted_probability": 0.9754,
+    "actual_decline_rate_retrospective": 0.95,
+    "mean_impressions_at_risk": 4073.4,
+    "mean_weighted_position": 2.91,
+    "top_reason_codes": {
+      "ACCELERATING_MOMENTUM_DROP": 20,
+      "SERP_RANK_DETERIORATION": 20,
+      "PAGE_ONE_HIGH_EXPOSURE": 20
+    },
+    "top_actions": {
+      "INVESTIGATE_SEARCH_DEMAND_DECLINE": 20,
+      "REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS": 20,
+      "ASSESS_EVERGREEN_CONTENT_FRESHNESS": 18
+    }
+  },
+  "top_50": {
+    "n_recommendations": 50,
+    "mean_predicted_probability": 0.9642,
+    "actual_decline_rate_retrospective": 0.98,
+    "mean_impressions_at_risk": 3448.6,
+    "mean_weighted_position": 4.05,
+    "top_reason_codes": {
+      "ACCELERATING_MOMENTUM_DROP": 50,
+      "SERP_RANK_DETERIORATION": 48,
+      "PAGE_ONE_HIGH_EXPOSURE": 47
+    },
+    "top_actions": {
+      "INVESTIGATE_SEARCH_DEMAND_DECLINE": 50,
+      "REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS": 48,
+      "ASSESS_EVERGREEN_CONTENT_FRESHNESS": 43
+    }
+  },
+  "top_100": {
+    "n_recommendations": 100,
+    "mean_predicted_probability": 0.9508,
+    "actual_decline_rate_retrospective": 0.96,
+    "mean_impressions_at_risk": 4294.9,
+    "mean_weighted_position": 4.21,
+    "top_reason_codes": {
+      "ACCELERATING_MOMENTUM_DROP": 100,
+      "PAGE_ONE_HIGH_EXPOSURE": 94,
+      "SERP_RANK_DETERIORATION": 92
+    },
+    "top_actions": {
+      "INVESTIGATE_SEARCH_DEMAND_DECLINE": 100,
+      "REVIEW_CONTENT_RELEVANCE_VS_COMPETITORS": 92,
+      "ASSESS_EVERGREEN_CONTENT_FRESHNESS": 88
+    }
+  }
+}

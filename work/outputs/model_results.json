@@ -1,0 +1,111 @@
+{
+  "evaluation_split": "client_grouped_holdout",
+  "random_state": 42,
+  "train_clients": 32,
+  "test_clients": 8,
+  "train_rows": 71353,
+  "test_rows": 29873,
+  "train_base_rate": 0.3757,
+  "test_base_rate": 0.5155,
+  "comparison_table": [
+    {
+      "Model": "Week 4 Baseline (Rule)",
+      "Train ROC-AUC": "-",
+      "Test ROC-AUC": 0.5066,
+      "Test PR-AUC": 0.5214,
+      "Test Precision@10": 0.7,
+      "Test Precision@20": 0.65,
+      "Test Precision@50": 0.68,
+      "Test Precision@100": 0.59,
+      "Precision": 0.5144,
+      "Recall": 0.7358,
+      "F1 Score": 0.6055
+    },
+    {
+      "Model": "Logistic Regression",
+      "Train ROC-AUC": 0.7283,
+      "Test ROC-AUC": 0.725,
+      "Test PR-AUC": 0.7245,
+      "Test Precision@10": 1.0,
+      "Test Precision@20": 0.95,
+      "Test Precision@50": 0.98,
+      "Test Precision@100": 0.97,
+      "Precision": 0.7,
+      "Recall": 0.5621,
+      "F1 Score": 0.6235
+    },
+    {
+      "Model": "Random Forest",
+      "Train ROC-AUC": 0.7843,
+      "Test ROC-AUC": 0.7353,
+      "Test PR-AUC": 0.7428,
+      "Test Precision@10": 1.0,
+      "Test Precision@20": 0.95,
+      "Test Precision@50": 0.98,
+      "Test Precision@100": 0.97,
+      "Precision": 0.7086,
+      "Recall": 0.5844,
+      "F1 Score": 0.6405
+    },
+    {
+      "Model": "Gradient Boosting",
+      "Train ROC-AUC": 0.7818,
+      "Test ROC-AUC": 0.7441,
+      "Test PR-AUC": 0.7521,
+      "Test Precision@10": 1.0,
+      "Test Precision@20": 0.95,
+      "Test Precision@50": 0.98,
+      "Test Precision@100": 0.96,
+      "Precision": 0.7171,
+      "Recall": 0.6009,
+      "F1 Score": 0.6539
+    }
+  ],
+  "confusion_matrices": {
+    "Logistic Regression": [
+      [
+        10763,
+        3710
+      ],
+      [
+        6743,
+        8657
+      ]
+    ],
+    "Random Forest": [
+      [
+        10772,
+        3701
+      ],
+      [
+        6400,
+        9000
+      ]
+    ],
+    "Gradient Boosting": [
+      [
+        10822,
+        3651
+      ],
+      [
+        6146,
+        9254
+      ]
+    ]
+  },
+  "random_forest_feature_importance": {
+    "mom_log_ratio": 0.3828447876919862,
+    "feat_observed_days": 0.1512368562202395,
+    "feat_ctr": 0.07903336900995939,
+    "feat_weighted_position": 0.07025726736468861,
+    "log_feat_clicks": 0.05752837660154122,
+    "has_feb_history": 0.05702149461776512,
+    "feat_position_volatility": 0.05560784676965857,
+    "log_feat_impressions": 0.05538430419899315,
+    "mom_position_change": 0.0438902039658966,
+    "mom_ctr_change": 0.023342136279474426,
+    "is_top20_position": 0.009798392261602359,
+    "is_top10_position": 0.009564979002999656,
+    "is_zero_clicks": 0.0044899860151951625
+  }
+}

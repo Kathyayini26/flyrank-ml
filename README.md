@@ -2,17 +2,62 @@
 
 **Applied Search Intelligence: Google Search Ranking & Discoverability**
 
-This is the starting point for the FlyRank ML Internship. You **clone it into your own public
-repo** (one click — *Use this template*), build everything there, and submit that repo URL on
-each assignment in your portal — it's your workspace, your submission, and your portfolio all
-at once. The rhythm is simple: do the work, commit it, submit on the card. Done.
+---
 
-Everything here runs on a small **anonymized** slice of real FlyRank search data. No credentials,
-no private client data, no setup headaches.
+# Capstone Project: AI-Based Content Opportunity Scoring and Ranked Recommendation System
 
-> **New here?** Two reads: **[SETUP.md](SETUP.md)** (GitHub, Colab, and data access — ten
-> minutes, with every silent pitfall flagged), then **[GUIDE.md](GUIDE.md)** (every file
-> explained, what to edit vs. leave alone, and where your own work goes — five minutes).
+**Research Lane:** Refresh / Content Opportunity Scoring  
+**Research Paper:** [`submission/research_paper.md`](submission/research_paper.md)  
+**Capstone Walkthrough Notebook:** [`capstone.ipynb`](capstone.ipynb) (mirrored in [`work/notebooks/capstone.ipynb`](work/notebooks/capstone.ipynb))  
+
+---
+
+### 1. Research Question
+
+> *"How can search performance signals be used to identify content opportunities and prioritise pages for improvement?"*
+
+### 2. Dataset
+
+- **Warehouse Source:** Hugging Face gated warehouse [`FlyRank/internship-warehouse`](https://huggingface.co/datasets/FlyRank/internship-warehouse) (`fact_content_daily_performance`, release snapshot `v20260703`).
+- **Warehouse Volume:** **27.6 million daily performance records** spanning February 1 to April 30, 2026.
+- **Eligible Content Cohort:** **101,226 eligible content pages** meeting strict scale ($\ge 100$ impressions), historical tracking persistence ($\ge 15$ days), and outcome observation coverage ($\ge 15$ days in April).
+- **Enterprise Client Diversity:** 40 enterprise clients represented in the eligible modelling cohort.
+
+### 3. Methodology
+
+- **Temporal Windows:** Historical feature window ($T_{\text{feat}}$) across February 1 – March 31, 2026 (59 calendar days); forward outcome window ($T_{\text{out}}$) across April 1 – April 30, 2026 (30 calendar days).
+- **Target Construction:** Scale-normalized month-over-month impression decline of $\ge 20\%$ relative to calendar-adjusted 30-day expectation (overall portfolio base rate: **41.69%**).
+- **Client-Grouped Holdout Validation:** Strict 80/20 grouped split by client domain (32 training clients = 71,353 pages; 8 unseen test clients = 29,873 pages; test base rate: **51.55%**) to eliminate domain-level data leakage.
+- **Feature Engineering:** 13 engineered features with reduced redundancy, centered on a stabilized symmetric log-ratio momentum metric that resolves extreme denominator outliers.
+- **Model Architectures Evaluated:** Week 4 Rule Baseline, Regularized Logistic Regression, Random Forest (100 trees), and Histogram-Based Gradient Boosting (HistGradientBoosting).
+- **Selected Architecture:** **HistGradientBoosting**, selected for top overall discrimination, the lowest Brier score among the evaluated ML models (0.2085), and operational ranking precision.
+
+### 4. Final Results
+
+| Model | ROC-AUC | PR-AUC | Precision@100 |
+|---|---:|---:|---:|
+| Week 4 Baseline | 0.5066 | 0.5214 | 0.5900 |
+| Logistic Regression | 0.7250 | 0.7245 | 0.9700 |
+| Random Forest | 0.7353 | 0.7428 | 0.9700 |
+| HistGradientBoosting | 0.7441 | 0.7521 | 0.9600 |
+
+> **Operational Decision-Support Boundary:** This machine learning system operates as an empirical prioritization tool to guide human editorial sprint workflows. It predicts historical patterns associated with forward traffic decline; it does **not** establish a causal claim that executing content refreshes mechanically causes traffic recovery.
+
+### 5. Repository Structure
+
+- [`capstone.ipynb`](capstone.ipynb) — Executed, self-contained end-to-end walkthrough notebook.
+- [`work/notebooks/`](work/notebooks/) — Complete weekly progression notebooks (Weeks 1–7) and capstone notebook.
+- [`work/scripts/`](work/scripts/) — End-to-end data engineering, model training, validation audit, queue builder, and verification scripts.
+- [`work/outputs/`](work/outputs/) — Evaluation receipts, audit reports, JSON metric records, and public-safe opportunity queue samples.
+- [`submission/research_paper.md`](submission/research_paper.md) — Complete 21-section academic research paper.
+
+### 6. Research Paper
+
+The full, publication-ready research paper is available at [`submission/research_paper.md`](submission/research_paper.md). It documents the mathematical target construction, feature derivations, out-of-domain grouped validation, subgroup client analyses ($N \ge 50$), diagnostic reason codes, and editorial action playbooks.
+
+### 7. Data Safety & Privacy
+
+In strict compliance with privacy standards, private datasets (`work/data/`), internal client identifiers (`client_...`), internal content identifiers (`content_...`), and private opportunity queues are excluded from Git via `.gitignore`. The public repository contains only aggregate metrics, anonymized receipts, and synthetic sample identifiers (`OPP_0001`–`OPP_0100`).
 
 ---
 
